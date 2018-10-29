@@ -8,6 +8,7 @@
 !  subroutine Lasso_Reg(beta,A,rou,vecS,W,m)   : calc. of beta and A using iterativemethod
 !  subroutine block_coordinate_descent_method(A,iA,S,rou,m) : A,iA <- S,rou.m
 !  subroutine cal_anomaly(Aa,Ab,Sa,an,m) : calc. anomaly between xa and xb from matrix A
+!  subroutine cal_anomaly2(Aa,Ab,iAa,iAb,Sa,an,m) : calc. anomaly between xa and xb from matrix A
 !  subroutine invm(A,iA,m) : calc. inverse matrix of A
 
 module graphical_Lasso
@@ -142,7 +143,7 @@ contains
     double precision  max_diff, min_diff                              ! value for convergence check
     integer, intent(in) :: m ! m : # of dimensions
 
-    double precision, parameter :: torelance = 1.0e-5 ! 1.0e-4 !1.0e-10
+    double precision, parameter ::  torelance = 1.0e-7 !1.0e-5 ! 1.0e-4 !1.0e-10
     double precision m_rou,  sum
 
     integer j,k,l
@@ -213,7 +214,7 @@ contains
 
     double precision, allocatable, dimension(:,:) :: A_prv, diff_A 
     double precision  max_diff, min_diff, sum                   ! values for convergence check
-    double precision, parameter :: torelance = 1.0e-5 ! 1.0e-4 ! 1.0e-10
+    double precision, parameter :: torelance = 1.0e-7 !1.0e-5 ! 1.0e-4 ! 1.0e-10
 
     integer i,j,k
     integer num_ite
@@ -325,16 +326,32 @@ contains
     end do
 
     ! Outputs for debug
-    !    write (*,'("A*iA=")')                             !
-    !    do i=1,m                                          !
-    !       do j=1,m                                       !
-    !          write (*,'(F8.3,1X)',advance='no'),AiA(i,j) !
-    !       end do                                         !
-    !       write (*,'(/)')                                !
-    !    end do                                            !
+       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+       ! write (*,'("A=")')                                !
+       ! do i=1,m                                          !
+       !    do j=1,m                                       !
+       !       write (*,'(F8.3,1X)',advance='no'),A(i,j)   !
+       !    end do                                         !
+       !    write (*,'(/)')                                !
+       ! end do                                            !
+       ! write (*,'("iA=")')                               !
+       ! do i=1,m                                          !
+       !    do j=1,m                                       !
+       !       write (*,'(F8.3,1X)',advance='no'),iA(i,j)  !
+       !    end do                                         !
+       !    write (*,'(/)')                                !
+       ! end do                                            !
+       ! write (*,'("A*iA=")')                             !
+       ! do i=1,m                                          !
+       !    do j=1,m                                       !
+       !       write (*,'(F8.3,1X)',advance='no'),AiA(i,j) !
+       !    end do                                         !
+       !    write (*,'(/)')                                !
+       ! end do                                            !
+       !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     ! Outputs for debug
 
-    write(*,'("The block coordinate descent method is converged til I4 -th iteration.")'), num_ite
+    write(*,'("The block coordinate descent method is converged til", I4, "-th iteration.")'), num_ite
     
     deallocate(W)
     deallocate(omg)
@@ -369,8 +386,8 @@ contains
     do i = 1,m,1
        do j = 1,m,1
           do k = 1,m,1
-             AaS(i,j)  = AaS(i,j) + Aa(i,j)*Sa(j,k)
-             AbSM(i,j) = AbSM(i,j) + Ab(i,j)*Sa(j,k)
+             AaS(i,j)  = AaS(i,j)  + Aa(i,k)*Sa(k,j)
+             AbSM(i,j) = AbSM(i,j) + Ab(i,k)*Sa(k,j)
           end do
        end do
     end do
@@ -380,8 +397,8 @@ contains
     do i = 1,m,1
        do j = 1,m,1
           do k = 1,m,1
-             AaSAa(i,j) = AaSAa(i,j) + AaS(i,j)*Aa(j,k)
-             AbSAb(i,j) = AbSAb(i,j) + AbSM(i,j)*Ab(j,k)
+             AaSAa(i,j) = AaSAa(i,j) + AaS(i,k)*Aa(k,j)
+             AbSAb(i,j) = AbSAb(i,j) + AbSM(i,k)*Ab(k,j)
           end do
        end do
     end do
@@ -390,15 +407,96 @@ contains
     
     do i = 1,m,1
        Aaii = Aa(i,i)
-       invAaii = 1.0d0 / Aa(i,i)
-       invAbii = 1.0d0 / Ab(i,i)
+!       invAaii = 1.0d0 / Aa(i,i)
+!       invAbii = 1.0d0 / Ab(i,i)
 
-       an(i) = 0.5d0 * (log(Aaii * invAbii) - AaSAa(i,i) * invAaii - AbSAb(i,i) * invAbii)
+!       an(i) = 0.5d0 * (log(Aaii * invAbii) - AaSAa(i,i) * invAaii + AbSAb(i,i) * invAbii)
+       an(i) = 0.5d0 * (log(Aaii / Ab(i,i))) - 0.5d0 * ( AaSAa(i,i) / Aaii - AbSAb(i,i) / Ab(i,i))
     end do
 
     deallocate(AaSAa, AbSAb)
   end subroutine calc_anomaly
 
+  subroutine calc_anomaly2(Aa,Ab,iAa,iAb,Sa,an,m) ! calc. anomaly(2) between xa and xb from matrix A
+    implicit none
+
+    double precision, allocatable, dimension(:,:), intent(in) :: Aa, Ab   ! Precision Matrix (m,m)
+    double precision, allocatable, dimension(:,:), intent(in) :: iAa, iAb ! Inverse of Precision Matrix (m,m)
+    double precision, allocatable, dimension(:,:), intent(in) :: Sa       ! Var-cov Matrix (m,m)
+    double precision, allocatable,dimension(:), intent(inout) :: an       ! (m), m dimension
+    integer, intent(in) :: m ! m : # of dimensions 
+
+    integer i,j,k
+    double precision lambda_a, lambda_b, sigma_a, sigma_b
+    double precision, allocatable, dimension(:) ::  omg_a, omg_b, vecla, veclb
+    double precision, allocatable, dimension(:,:) ::  Wa, Wb
+
+    double precision lbTWalb, laTWala, omg_aTlbmla
+    double precision, allocatable, dimension(:) ::  Walb, Wala
+    
+    allocate(omg_a(m-1), vecla(m-1), Wa(m-1,m-1))
+    allocate(omg_b(m-1), veclb(m-1), Wb(m-1,m-1))
+
+    allocate(Walb(m-1), Wala(m-1))
+
+    an = 0.0d0
+    do i = 1,m,1
+       call set_W(Wa,omg_a,sigma_a,iAa,m,i)
+
+       if ( i /= 1 .and. i /= m ) then
+          vecla(1:i-1) = Aa(i,1:i-1)
+          vecla(i:m-1) = Aa(i,i+1:m)
+       else if ( i == 1 ) then
+          vecla(1:m-1) = Aa(1,2:m)
+       else
+          vecla(1:m-1) = Aa(m,1:m-1)
+       endif
+       lambda_a = Aa(i,i)
+       
+       call set_W(Wb,omg_b,sigma_b,iAb,m,i)
+
+       if ( i /= 1 .and. i /= m ) then
+          veclb(1:i-1) = Ab(i,1:i-1)
+          veclb(i:m-1) = Ab(i,i+1:m)
+       else if ( i == 1 ) then
+          veclb(1:m-1) = Ab(1,2:m)
+       else
+          veclb(1:m-1) = Ab(m,1:m-1)
+       endif
+       lambda_b = Ab(i,i)
+
+       omg_aTlbmla = 0.0d0
+       do j = 1,m-1,1
+          omg_aTlbmla = omg_aTlbmla + omg_a(j)*(veclb(j) - vecla(j))
+       end do
+
+       Walb = 0.0d0
+       Wala = 0.0d0
+       do j = 1,m-1,1
+          do k = 1,m-1,1
+             Walb(j) = Walb(j) + Wa(j,k)*veclb(k)
+             Wala(j) = Wala(j) + Wa(j,k)*vecla(k)
+          end do
+       end do
+
+       lbTWalb = 0.0d0
+       laTWala = 0.0d0
+       do j = 1,m-1,1
+          lbTWalb = lbTWalb + veclb(j)*Walb(j)
+          laTWala = laTWala + vecla(j)*Wala(j)
+       end do
+       
+       an(i) = omg_aTlbmla
+       an(i) = an(i) + 0.5d0 * (lbTWalb / lambda_b - laTWala / lambda_a)
+       an(i) = an(i) + 0.5d0 * (log(lambda_a / lambda_b) + sigma_a * (lambda_b - lambda_a))
+    end do
+
+    deallocate(omg_a, vecla, Wa)
+    deallocate(omg_b, veclb, Wb)
+    
+    deallocate(Walb, Wala)
+  end subroutine calc_anomaly2
+  
   subroutine invm(Mat,iMat,m) ! calc. inverse matrix of Mat
     implicit none
     

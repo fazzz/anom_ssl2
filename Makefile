@@ -27,7 +27,7 @@ graphical_Lasso.o:
 standardlize.o:
 
 .f90.o:
-	$(FC) -c $<;
+	$(FC) $(FLAG) -c $<;
 
 .PHONY:clean install
 clean:
