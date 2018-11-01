@@ -7,8 +7,8 @@
 !  subroutine set_iA(iA,vecS,W,beta,vecA,m,i)  : set iA from W, beta, and vecA
 !  subroutine Lasso_Reg(beta,A,rou,vecS,W,m)   : calc. of beta and A using iterativemethod
 !  subroutine block_coordinate_descent_method(A,iA,S,rou,m) : A,iA <- S,rou.m
-!  subroutine cal_anomaly(Aa,Ab,Sa,an,m) : calc. anomaly between xa and xb from matrix A
-!  subroutine cal_anomaly2(Aa,Ab,iAa,iAb,Sa,an,m) : calc. anomaly between xa and xb from matrix A
+!  subroutine calc_anomaly(Aa,Ab,Sa,an,m) : calc. anomaly between xa and xb from matrix A
+!  subroutine calc_anomaly2(Aa,Ab,iAa,iAb,Sa,an,m) : calc. anomaly between xa and xb from matrix A
 !  subroutine invm(A,iA,m) : calc. inverse matrix of A
 
 module graphical_Lasso

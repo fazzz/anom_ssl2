@@ -43,62 +43,15 @@ program a_ssl
      !     call getarg(3,out_filename)
   end if
 
-  allocate(xa(ndim,1))
-  i = 1 ! index for frame
-  j = 0 ! index for dimension
   open(21,file=dataa_filename,status='old')
-  do 
-     ! input file format is as below.
-     read(21,'(F8.3,1X,F8.3,1X,F8.3,1X,F8.3,1X,F8.3)',end=999),v(1),v(2),v(3),v(4),v(5)
-     do k = 1,5,1
-        j = j + 1
-        if ( j > ndim ) then
-           allocate(B(ndim,i))
-           B = xa
-           i = i + 1
-           j = 1
-           deallocate(xa)
-           allocate(xa(ndim,i))
-           xa(1:ndim,1:i-1) = B(1:ndim,1:i-1)
-           deallocate(B)
-           xa(j,i) = v(k)
-        else
-           xa(j,i) = v(k)
-        end if
-     end do
-  end do
-999 close(21)
-  nframea = i - 1
+  allocate(xa(ndim,1))
+  call read_dat(21, nframea, ndim, xa)
 
-  allocate(xb(ndim,1))
-  i = 1 ! index for frame
-  j = 0 ! index for dimension
   open(21,file=datab_filename,status='old')
-  do 
-     ! input file format is as below.
-     read(21,'(F8.3,1X,F8.3,1X,F8.3,1X,F8.3,1X,F8.3)',end=997),v(1),v(2),v(3),v(4),v(5)
-     do k = 1,5,1
-        j = j + 1
-        if ( j > ndim ) then
-           allocate(B(ndim,i))
-           B = xb
-           i = i + 1
-           j = 1
-           deallocate(xb)
-           allocate(xb(ndim,i))
-           xb(1:ndim,1:i-1) = B(1:ndim,1:i-1)
-           deallocate(B)
-           xb(j,i) = v(k)
-        else
-           xb(j,i) = v(k)
-        end if
-     end do
-  end do
-997 close(21)
-  nframeb = i - 1
+  allocate(xb(ndim,1))
+  call read_dat(21, nframeb, ndim, xb)
 
   ! open(19,file=out_filename,status='new')
-  write(*,'("       Number of the data set B = ", I4)'), nframeb
   write(*,'("       Number of the data set A = ", I4)'), nframea
   write(*,'("       Number of the data set B = ", I4)'), nframeb
   write(*,'("       Degrees of freedom = ", I4)'), ndim
@@ -261,4 +214,50 @@ contains
     stop
   end subroutine usage
   
+  ! Read input file
+  subroutine read_dat (unitnum, N, ndim, x)
+
+    implicit none
+    integer, intent(in) :: unitnum
+    integer, intent(out) :: N
+    integer, intent(in) :: ndim
+    double precision,allocatable, dimension(:,:), intent(inout) :: x
+
+    integer :: i, j, k
+    double precision, allocatable, dimension(:,:) :: B
+    double precision v
+    integer err
+    
+    i = 1
+    j = 0
+    do 
+       read (unitnum, '(F8.3)', advance="NO",iostat=err, end=999), v
+       if (err .eq. 0 ) then
+          j = j + 1
+          if ( j > ndim) then
+             allocate(B(ndim,i))
+             B = x
+             i = i + 1
+             j = 1
+             deallocate(x)
+             allocate(x(ndim,i))
+             x(1:ndim,1:i-1) = B(1:ndim,1:i-1)
+             deallocate(B)
+             x(j,i) = v
+          else
+             x(j,i) = v
+          end if
+       end if
+    end do
+999 N = i - 1
+
+!  do i = 1,Nndx,1
+!     write(*,'(I4,1X)', advance="NO"), atom_list(i)
+!     if (mod(i,10) .eq. 0) then
+!        write(*,"()")
+!     end if
+!  end do
+    
+  end subroutine read_dat
+
 end program a_ssl
