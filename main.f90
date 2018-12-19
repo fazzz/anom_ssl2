@@ -14,10 +14,10 @@ program a_ssl
   double precision,allocatable, dimension(:,:) :: xa, xb    ! (m x n), time series
   double precision,allocatable, dimension(:)   :: avxa,avxb ! (m), average of data
 
-  double precision,allocatable,dimension(:,:) :: Aa, Ab, Unit    ! (m x m), presicion matrix
-  double precision,allocatable,dimension(:,:) :: iAa, iAb  ! (m x m), inverse presis matrix
-  double precision,allocatable,dimension(:,:) :: Sa, Sb    ! (m x m), sample variance-covariance matrix
-  double precision,allocatable,dimension(:)   :: an_ab, an_ba        ! (m), anomaly for each dimension
+  double precision,allocatable,dimension(:,:) :: Aa, Ab, Unit   ! (m x m), presicion matrix
+  double precision,allocatable,dimension(:,:) :: iAa, iAb       ! (m x m), inverse presis matrix
+  double precision,allocatable,dimension(:,:) :: Sa, Sb         ! (m x m), sample variance-covariance matrix
+  double precision,allocatable,dimension(:)   :: an_ab, an_ba   ! (m), anomaly for each dimension
   double precision r ! degree of sparsity
   double precision, allocatable, dimension(:,:) :: B(:,:)   ! dummy matrix
   double precision v(5) ! dummy values
@@ -46,10 +46,12 @@ program a_ssl
   open(21,file=dataa_filename,status='old')
   allocate(xa(ndim,1))
   call read_dat(21, nframea, ndim, xa)
+  close(21) ! 2018/11/05
 
-  open(21,file=datab_filename,status='old')
+  open(22,file=datab_filename,status='old')
   allocate(xb(ndim,1))
-  call read_dat(21, nframeb, ndim, xb)
+  call read_dat(22, nframeb, ndim, xb)
+  close(22)
 
   ! open(19,file=out_filename,status='new')
   write(*,'("       Number of the data set A = ", I4)'), nframea
@@ -90,7 +92,7 @@ program a_ssl
   k = 0
   write(*,'("The sample variance-covarucance matrix of the data set B")')
   do i=1,ndim,1
-     do j=i,ndim,1 !do j=1,ndim,1
+     do j=i,ndim,1
         k = k + 1
         write(*,'(F8.3,1X)', advance='no'), Sb(i,j)
         if (mod(k,5) .eq. 0) then
@@ -107,7 +109,7 @@ program a_ssl
   k = 0
   write (*,'("The MAP estimation of presicion matrix from the data set A")')
   do i=1,ndim
-     do j=i,ndim !do j=1,ndim
+     do j=i,ndim
         k = k + 1
         write (*,'(F8.3,1X)',advance='no'), Aa(i,j)
         if (mod(k,5) .eq. 0) then
@@ -119,7 +121,7 @@ program a_ssl
   k = 0
   write (*,'("The inverse matrix of the presicion matrix from the data set A")')
   do i=1,ndim
-     do j=i,ndim !do j=1,ndim
+     do j=i,ndim
         k = k + 1
         write (*,'(F8.3,1X)',advance='no'), iAa(i,j)
         if (mod(k,5) .eq. 0) then
@@ -132,7 +134,7 @@ program a_ssl
   k = 0
   write (*,'("The MAP estimation of presicion matrix from the data set B")')
   do i=1,ndim
-     do j=i,ndim !do j=1,ndim
+     do j=i,ndim
         k = k + 1
         write (*,'(F8.3,1X)',advance='no'), Ab(i,j)
         if (mod(k,5) .eq. 0) then
@@ -144,7 +146,7 @@ program a_ssl
   k = 0
   write (*,'("The inverse matrix of the presicion matrix from the data set B")')
   do i=1,ndim
-     do j=i,ndim !do j=1,ndim
+     do j=i,ndim
         k = k + 1
         write (*,'(F8.3,1X)',advance='no'), iAb(i,j)
         if (mod(k,5) .eq. 0) then
@@ -153,31 +155,25 @@ program a_ssl
      end do
   end do
   write(*,'(/)',advance='no')
+    
+  write (*,'("The Sparse structure of data set A")')
+  do i=1,ndim,1
+     do j=i+1,ndim,1
+        if ( Aa(i,j) /= 0.0d0 ) then
+           write (*,'(I3,1X,I3)'), i,j
+        end if
+     end do
+  end do
 
-  
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  ! allocate(Unit(ndim,ndim))                           ! ! !
-  !                                                     ! ! !
-  ! Unit = 0.0d0                                        ! ! !
-  ! do i = 1,ndim                                       ! ! !
-  !    do j = 1,ndim                                    ! ! !
-  !       do k = 1,ndim                                 ! ! !
-  !          Unit(i,j) = Unit(i,j) + Aa(i,k)*iAa(k,j)   ! ! !
-  !       end do                                        ! ! !
-  !    end do                                           ! ! !
-  ! end do                                              ! ! !
-  !                                                     ! ! !
-  ! do i=1,ndim                                         ! ! !
-  !    do j=1,ndim                                      ! ! !
-  !       write (*,'(F8.3,1X)',advance='no'), Unit(i,j) ! ! !
-  !    end do                                           ! ! !
-  !    write(*,'(/)',advance='no')                      ! ! !
-  ! end do                                              ! ! !
-  ! write(*,'(/)',advance='no')                         ! ! !
-  !                                                     ! ! !
-  ! deallocate(Unit)                                    ! ! !
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  
+  write (*,'("The Sparse structure of data set B")')
+  do i=1,ndim,1
+     do j=i+1,ndim,1
+        if ( Ab(i,j) /= 0.0d0 ) then
+           write (*,'(I3,1X,I3)'), i,j
+        end if
+     end do
+  end do
+
   allocate(an_ab(ndim), an_ba(ndim))
 
 !  call calc_anomaly(Aa,Ab,Sa,an_ab,ndim) ! an_ab <- Aa, Ab, Sa, m
@@ -231,7 +227,7 @@ contains
     i = 1
     j = 0
     do 
-       read (unitnum, '(F8.3)', advance="NO",iostat=err, end=999), v
+       read (unitnum, '(F8.31X)', advance="NO",iostat=err, end=999), v
        if (err .eq. 0 ) then
           j = j + 1
           if ( j > ndim) then
@@ -249,15 +245,12 @@ contains
           end if
        end if
     end do
-999 N = i - 1
-
+999 N = i !N = i - 1
 !  do i = 1,Nndx,1
 !     write(*,'(I4,1X)', advance="NO"), atom_list(i)
 !     if (mod(i,10) .eq. 0) then
 !        write(*,"()")
 !     end if
 !  end do
-    
   end subroutine read_dat
-
 end program a_ssl

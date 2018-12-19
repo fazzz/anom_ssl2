@@ -143,7 +143,7 @@ contains
     double precision  max_diff, min_diff                              ! value for convergence check
     integer, intent(in) :: m ! m : # of dimensions
 
-    double precision, parameter ::  torelance = 1.0e-7 !1.0e-5 ! 1.0e-4 !1.0e-10
+    double precision, parameter ::  torelance = 1.0e-10 ! 1.0e-5 ! 1.0e-4 !1.0e-10
     double precision m_rou,  sum
 
     integer j,k,l
@@ -159,8 +159,37 @@ contains
     
     beta_prv = beta
 
-    do j=1,m-1,1
-       do while (max_diff > torelance .and. num_ite < 10000)  ! converegence of beta
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    ! do j=1,m-1,1                                                                     !
+    !    do while (max_diff > torelance .and. num_ite < 10000)  ! converegence of beta !
+    !       if (A(j) > rou)  then                                                      !
+    !          beta(j) = (A(j) - rou) / W(j,j)                                         !
+    !       else if (A(j) < m_rou) then                                                !
+    !          beta(j) = (A(j) + rou) / W(j,j)                                         !
+    !       else                                                                       !
+    !          beta(j) = 0.0d0                                                         !
+    !       endif                                                                      !
+    !                                                                                  !
+    !       do k=1,m-1,1                                                               !
+    !          A(k) = vecS(k)                                                          !
+    !          do l=1,m-1,1                                                            !
+    !             if (l /= k) then                                                     !
+    !                A(k) = A(k) - W(k,l) * beta(l)                                    !
+    !             endif                                                                !
+    !          end do                                                                  !
+    !       end do                                                                     !
+    !                                                                                  !
+    !       beta_dif(j) = beta(j) - beta_prv(j)                                        !
+    !       max_diff = abs(beta_dif(j))                                                !
+    !                                                                                  !
+    !       beta_prv = beta                                                            !
+    !       num_ite = num_ite + 1                                                      !
+    !    end do                                                                        !
+    ! end do                                                                           !
+    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    do while (max_diff > torelance .and. num_ite < 10000)  ! converegence of beta
+       do j=1,m-1,1
           if (A(j) > rou)  then
              beta(j) = (A(j) - rou) / W(j,j)
           else if (A(j) < m_rou) then
@@ -178,8 +207,14 @@ contains
              end do
           end do
 
-          beta_dif(j) = beta(j) - beta_prv(j)
-          max_diff = abs(beta_dif(j))
+          beta_dif = beta - beta_prv
+          max_diff = maxval(beta_dif)
+          max_diff = abs(max_diff)
+          min_diff = minval(beta_dif)
+          min_diff = abs(min_diff)
+          if ( min_diff > max_diff ) then
+             max_diff = min_diff
+          end if
 
           beta_prv = beta
           num_ite = num_ite + 1
@@ -214,7 +249,7 @@ contains
 
     double precision, allocatable, dimension(:,:) :: A_prv, diff_A 
     double precision  max_diff, min_diff, sum                   ! values for convergence check
-    double precision, parameter :: torelance = 1.0e-7 !1.0e-5 ! 1.0e-4 ! 1.0e-10
+    double precision, parameter :: torelance = 1.0e-10 ! 1.0e-5 ! 1.0e-4 ! 1.0e-10
 
     integer i,j,k
     integer num_ite
@@ -230,6 +265,8 @@ contains
     allocate(vecl(m-1))
 
     allocate(A_prv(m,m))
+
+    allocate(diff_A(m,m)) ! 2018/11/05
 
     allocate(AiA(m,m))
 
@@ -308,7 +345,7 @@ contains
           if ( min_diff > max_diff ) then
              max_diff = min_diff
           end if
-!          write(*,'(I3,"-th max diff:",F10.6)'),num_ite,max_diff
+          write(*,'(I3,"-th max diff:",F10.6)'),num_ite,max_diff
 !       else
 !          write(*,'("The begining of iteration of block coordinate descent method... ")')
        endif
@@ -358,6 +395,9 @@ contains
 
     deallocate(vecA)
     deallocate(beta)
+
+    deallocate(A_prv)  ! 2018/11/05
+    deallocate(diff_A) ! 2018/11/05
 
     deallocate(AiA)
 
