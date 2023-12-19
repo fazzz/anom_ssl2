@@ -2,14 +2,14 @@
 # Makefile for assl (Anomaly Detection Using Sparse Structure Learning)
 #
 
-prefix = /home/yamamori/opt
-exec_prefix = /home/yamamori/opt
-HOME   = /home/yamamori/opt
-bindir = ${exec_prefix}/bin
-LIBDIR = -L/home/yamamori/softwares/anom_ssl2/lib
-exdir  = ./../ex/t4l_open-to-close/ene/
+prefix = @prefix@
+exec_prefix = @prefix@
+HOME   = @prefix@
+bindir = @bindir@
+LIBDIR = @LDFLAGS@
+exdir  = @srcdir@/../ex/t4l_open-to-close/ene/
 
-FC   = gfortran
+FC   = @FC@
 
 FLAG = -O2
 

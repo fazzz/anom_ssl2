@@ -3,7 +3,7 @@
 
 !  subroutine ave_timeseries(x,avx,n,m)     : time average of each dimension.
 !  subroutine vcv_timeseries(x,n,m,avx,vcx) : variance covariance matrix
-!  subroutine standradlize_ts(x,n,m)        : standradlize the data , time series
+!  subroutine standradlize_ts(x,n,m,mode)   : standradlize the data , time series
 
 module standardlize
   implicit none
@@ -55,12 +55,13 @@ contains
 
   end subroutine vcv_timeseries
 
-  subroutine standradlize_ts(x,n,m) ! standradlize the data , time series
+  subroutine standradlize_ts(x,n,m,mode) ! standradlize the data , time series
     implicit none
 
     double precision, allocatable,dimension(:,:),intent(inout) :: x ! data(m,n)
     integer,intent(in) :: m ! # of dimensions
     integer,intent(in) :: n ! # of steps
+    integer,intent(in) :: mode ! if mdoe = 0, standarization will be done, if mode = 1, not.
 
     double precision, allocatable,dimension(:) :: avx ! average of data (m)
     double precision, allocatable,dimension(:,:) :: vcx ! variance-covariance of data (m,m)
@@ -74,11 +75,19 @@ contains
 
     call vcv_timeseries(x,n,m,avx,vcx)
 
-    do i=1,n,1
-       do j=1,m,1
-          x(j,i) = (x(j,i) - avx(j)) / sqrt(vcx(j,j))
+    if (mode .eq. 0) then
+       do i=1,n,1
+          do j=1,m,1
+             x(j,i) = (x(j,i) - avx(j)) / sqrt(vcx(j,j))
+          end do
        end do
-    end do
+    else
+       do i=1,n,1
+          do j=1,m,1
+             x(j,i) = x(j,i) - avx(j)
+          end do
+       end do
+    end if
 
     deallocate(avx)
     deallocate(vcx)
