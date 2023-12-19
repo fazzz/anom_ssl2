@@ -41,11 +41,17 @@ assl2 -Sparsity *r* -ndim *ndist* *time_series_A* *time_series_B* > *out*
 
 The followings are the options for `assl2`.
 
-  -mode     :  if 0 normal standarization will be done, if 1 not
-  -ninia    :  initial step of data A
-  -ninib    :  initial step of data B
-  -nfina    :  final   step of data A
-  -nfinb    :  final   step of data B
-  -Sparsity :  sparsity
-  -ndim     :  dimensionality of data
+[-mode ]   `if 0 normal standarization will be done, if 1 not`
+
+[-ninia]    `initial step of data A`
+
+[-ninib]    `initial step of data B`
+
+[-nfina]    `final   step of data A`
+
+[-nfinb]    `final   step of data B`
+
+[-Sparsity] `sparsity (from 0 to 1)`
+
+[-ndim]     `dimensionality of data`
 
