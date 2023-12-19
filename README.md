@@ -2,12 +2,15 @@
 
 This is a tool based on Sparse Structure Learning (Ide et. al. 2008) for Givin Two Data sets of Time Serie
 
+<!--
 ## The algorithms
+-->
 
 ## Requirement
 
-LAPACK (http://www.chokkan.org/software/liblbfgs/)
+LAPACK (https://github.com/Reference-LAPACK/lapack/archive/refs/tags/v3.10.0.tar.gz)
 
+<!--
 ``
 wget https://github.com/Reference-LAPACK/lapack/archive/refs/tags/v3.10.0.tar.gz
 tar -zxvf v3.10.0.tar.gz
@@ -19,6 +22,7 @@ cp lapack-3.10.0/liblapack.a $LAPACK/
 cp librefblas.a $LAPACK/libblas.a
 cp lapack-3.10.0/libtmglib.a $LAPACK/
 ``
+-->
 
 ## Installation
 
@@ -30,18 +34,18 @@ make && make install
 ## How to use
 
 ``
-assl2
+assl2 -Sparsity *r* -ndim *ndist* *time_series_A* *time_series_B* > *out*
 ``
 
 ## Options
 
 The followings are the options for `assl2`.
 
-[--Del] `error width` (default)
-
-[--Expm] `parameter file name` (default)
-
-## Parameter files
-
-## Examples
+  -mode     :  if 0 normal standarization will be done, if 1 not
+  -ninia    :  initial step of data A
+  -ninib    :  initial step of data B
+  -nfina    :  final   step of data A
+  -nfinb    :  final   step of data B
+  -Sparsity :  sparsity
+  -ndim     :  dimensionality of data
 
