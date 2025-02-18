@@ -57,20 +57,21 @@ The followings are the options for `assl2`.
 
 ## Output
 
-           Program Name:assl2
-        Data A is ../dist_r-r_3/r-r_dist_union-open-close.txt
-        Data B is ../../../close/analyses_2/dist_r-r_3/r-r_dist_union-open-close.txt
+``
+Program Name:assl2
+Data A is <time series A text file>
+Data B is <time series B text file>
 
-       Number of the data set A = ****
-       Number of the data set B = ****
-        Options
-        Mode                        =            0
-        Initial step of data A      =            1
-        Initial step of data B      =            1
-        Final   step of data A      =        10001
-        Final   step of data B      =        10001
-        Degrees of freedom          =          912
-        Value of sparsity parameter =    0.900
+Number of the data set A = <N>
+Number of the data set B = <N>
+Options
+Mode                        =            0
+Initial step of data A      =            1
+Initial step of data B      =            1
+Final   step of data A      =        10001
+Final   step of data B      =        10001
+egrees of freedom          =          912
+alue of sparsity parameter =    0.900
 
 The block coordinate descent method will be started.
   2-th max diff:  0.020183
@@ -99,7 +100,45 @@ The Sparse structure of data set A
   2   5
   2   6
   2   9
-
-
-
-
+...
+The Sparse structure of data set B
+  1   2
+  1   3
+  1   4
+  1   5
+  3   4
+  3   5
+  3  13
+  4   5
+  4   6
+  4   7
+  4   8
+  5   6
+  5   7
+  5   8
+  6   8
+  7   8
+...
+The anomaly of each dimension
+  #      a->b     b->a     max)
+  1    0.000    0.000    0.000
+  2    0.000    0.000    0.000
+  3    0.000    0.000    0.000
+  4    0.000    0.000    0.000
+  5    0.001    0.001    0.001
+  6    0.001    0.001    0.001
+  7    0.000    0.000    0.000
+  8    0.000    0.000    0.000
+  9    0.000    0.000    0.000
+ 10    0.000    0.000    0.000
+ 11    0.000    0.000    0.000
+ 12    0.000    0.000    0.000
+ 13    0.000    0.000    0.000
+ 14   -0.000    0.000    0.000
+ 15    0.000    0.000    0.000
+ 16   -0.000   -0.000   -0.000
+ 17    0.000    0.000    0.000
+ 18    0.000    0.000    0.000
+ 19   -0.000    0.000    0.000
+ 20    0.000   -0.000    0.000
+``
