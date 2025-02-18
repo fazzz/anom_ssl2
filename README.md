@@ -65,13 +65,13 @@ Data B is <time series B text file>
 Number of the data set A = <N>
 Number of the data set B = <N>
 Options
-Mode                        =            0
-Initial step of data A      =            1
-Initial step of data B      =            1
-Final   step of data A      =        10001
-Final   step of data B      =        10001
-egrees of freedom          =          912
-alue of sparsity parameter =    0.900
+Mode                        =  <0 or 1>
+Initial step of data A      =  <n1>
+Initial step of data B      =  <n2>
+Final   step of data A      =  <N1>
+Final   step of data B      =  <N2>
+egrees of freedom           =  <M>
+alue of sparsity parameter  =  <r>          
 
 The block coordinate descent method will be started.
   2-th max diff:  0.020183
