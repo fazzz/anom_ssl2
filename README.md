@@ -112,12 +112,6 @@ The Sparse structure of data set B
   4   5
   4   6
   4   7
-  4   8
-  5   6
-  5   7
-  5   8
-  6   8
-  7   8
 ...
 The anomaly of each dimension
   #      a->b     b->a     max)
@@ -131,15 +125,16 @@ The anomaly of each dimension
   8    0.000    0.000    0.000
   9    0.000    0.000    0.000
  10    0.000    0.000    0.000
- 11    0.000    0.000    0.000
- 12    0.000    0.000    0.000
- 13    0.000    0.000    0.000
- 14   -0.000    0.000    0.000
- 15    0.000    0.000    0.000
- 16   -0.000   -0.000   -0.000
- 17    0.000    0.000    0.000
- 18    0.000    0.000    0.000
- 19   -0.000    0.000    0.000
- 20    0.000   -0.000    0.000
 ```
+
+This output consists of several blocks, each presenting different information:
+
+The first block displays the input file.
+The second block shows the contents of the options used.
+The third block presents the convergence of the computation.
+The block "The sparse structure of data set A" illustrates the sparse correlation of data set A.
+The paired numbers represent the indices of degrees of freedom that exhibit correlation. Similarly, the block "The sparse structure of data set B" conveys the same meaning for data set B.
+
+Finally, the block "The anomaly of each dimension" identifies the degrees of freedom that exhibit anomalies by comparing data set A and data set B.
+The first column represents the index of the degree of freedom, and when the value in the fourth column is nonzero, that degree of freedom is considered to have an anomaly.
 
