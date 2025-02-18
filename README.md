@@ -130,11 +130,15 @@ The anomaly of each dimension
 This output consists of several blocks, each presenting different information:
 
 The first block displays the input file.
+
 The second block shows the contents of the options used.
+
 The third block presents the convergence of the computation.
+
 The block "The sparse structure of data set A" illustrates the sparse correlation of data set A.
 The paired numbers represent the indices of degrees of freedom that exhibit correlation. Similarly, the block "The sparse structure of data set B" conveys the same meaning for data set B.
 
 Finally, the block "The anomaly of each dimension" identifies the degrees of freedom that exhibit anomalies by comparing data set A and data set B.
 The first column represents the index of the degree of freedom, and when the value in the fourth column is nonzero, that degree of freedom is considered to have an anomaly.
+
 
